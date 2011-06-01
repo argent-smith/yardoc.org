@@ -1,0 +1,4 @@
+TRANSLATIONS = [
+  'en',
+  'ru'
+]

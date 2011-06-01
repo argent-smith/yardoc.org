@@ -3,12 +3,12 @@ require 'sinatra'
 
 set :root, File.dirname(__FILE__)
 set :public, Proc.new { File.join(root, "public") }
-set :environment, :production
+set :environment, :development
 
 # This before filter ensures that your pages are only ever served 
 # once (per deploy) by Sinatra, and then by Varnish after that
 before do
-  response.headers['Cache-Control'] = 'public, max-age=300' # 5 min
+  #response.headers['Cache-Control'] = 'public, max-age=300' # 5 min
   #response.headers['Cache-Control'] = 'no-cache' # never cache
 end
 
