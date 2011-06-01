@@ -35,7 +35,7 @@ class Generator
   end
   
   def write
-    path = File.join(ROOT, 'public', url + '.html')
+    path = File.join(ROOT, 'public', 'en', url + '.html')
     FileUtils.mkdir_p(File.dirname(path))
     File.open(path, 'w') {|f| f.write to_html }
   end
