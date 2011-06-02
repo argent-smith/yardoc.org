@@ -7,8 +7,9 @@ require 'erb'
 ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 LAYOUTS = {}
 
-SRC = 'src'            # useful abstraction?
-PUB = 'public'         # and this, too?
+# source/destination
+SRC = 'src'     
+PUB = 'public'
 
 $:.unshift ROOT        # These guys are here
 require 'translations' # to aid localization
@@ -42,7 +43,7 @@ class Generator
   end
   
   def write
-    path = File.join(ROOT, 'public', url + '.html')
+    path = File.join(ROOT, PUB, url + '.html')
     FileUtils.mkdir_p(File.dirname(path))
     File.open(path, 'w') {|f| f.write to_html }
   end
