@@ -7,13 +7,19 @@ require 'erb'
 ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 LAYOUTS = {}
 
+SRC = 'src'            # useful abstraction?
+PUB = 'public'         # and this, too?
+
+$:.unshift ROOT        # These guys are here
+require 'translations' # to aid localization
+
 module Helpers
   def markdown(text)
     RDiscount.new(text).to_html
   end
   
   def erb(__file)
-    LAYOUTS[__file] ||= File.read(File.join(ROOT, 'templates', "#{__file}.erb"))
+    LAYOUTS[__file] ||= File.read(File.join(ROOT, SRC, self.lang, 'templates', "#{__file}.erb"))
     ERB.new(LAYOUTS[__file], 0, '<>').result(binding)
   end
 end
@@ -21,10 +27,11 @@ end
 class Generator
   include Helpers
   
-  attr_accessor :url, :root_path, :layout, :content, :title
+  attr_accessor :lang, :url, :root_path, :layout, :content, :title
   
-  def initialize(url, layout, root_path = '.')
+  def initialize(lang, url, layout, root_path = '.')
     self.root_path = root_path.empty? ? '.' : root_path.gsub(%r{/$}, '')
+    self.lang = lang
     self.url = url
     self.layout = layout.to_sym
     yield(self) if block_given?
@@ -41,26 +48,28 @@ class Generator
   end
 end
 
-def map(url, layout, &block)
-  Generator.new(url, layout, '../' * url.count('/'), &block).write
+def map(lang, url, layout, &block)
+  Generator.new(lang, url, layout, '../' * url.count('/'), &block).write
 end
 
-Dir[File.join(ROOT, 'site/**/*.{md,html}')].each do |file|
-  rel = File.relative_path(File.dirname(file), ROOT)
-  rel = '.' if rel.empty?
-  url = file.sub(/^#{ROOT}\/site\/*/, '').sub(/\.(html|md)$/, '')
-  content = File.read(file)
-  gen = Generator.new(url, file =~ %r{/guides/} ? :guide : :regular, rel)
-  gen.content = content
-  case file
-  when /\.md$/
-    gen.title = content[/\A\s*#\s*(.+)/, 1]
-    gen.content = gen.markdown(content)
-  else
+TRANSLATIONS.each do |lang|
+  Dir[File.join(ROOT, SRC, lang, 'site/**/*.{md,html}')].each do |file|
+    rel = File.relative_path(File.dirname(file), ROOT)
+    rel = '.' if rel.empty?
+    url = file.sub(%r{^#{ROOT}/#{SRC}/#{lang}/site/*}, "#{lang}/").sub(/\.(html|md)$/, '')
+    content = File.read(file)
+    gen = Generator.new(lang, url, file =~ %r{/guides/} ? :guide : :regular, rel)
     gen.content = content
+    case file
+    when /\.md$/
+      gen.title = content[/\A\s*#\s*(.+)/, 1]
+        gen.content = gen.markdown(content)
+    else
+      gen.content = content
+    end
+    gen.write
   end
-  gen.write
-end
 
-map 'index', :home
-map 'guides/index', :guides
+  map lang, "#{lang}/index", :home
+  map lang, "#{lang}/guides/index", :guides
+end
