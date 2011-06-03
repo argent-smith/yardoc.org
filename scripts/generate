@@ -31,7 +31,8 @@ class Generator
   attr_accessor :lang, :url, :root_path, :layout, :content, :title
   
   def initialize(lang, url, layout, root_path = '.')
-    self.root_path = root_path.empty? ? '.' : root_path.gsub(%r{/$}, '')
+    self.root_path = (root_path.empty? or root_path.eql?('..'))? '.' : root_path.gsub(%r{/$}, '')
+    self.root_path = self.root_path.gsub(%r{^\.\./}, '')
     self.lang = lang
     self.url = url
     self.layout = layout.to_sym
@@ -50,7 +51,7 @@ class Generator
 end
 
 def map(lang, url, layout, &block)
-  Generator.new(lang, url, layout, '../' * url.count('/'), &block).write
+  Generator.new(lang, url, layout, '../' * url.count('/').pred, &block).write
 end
 
 TRANSLATIONS.each do |lang|
@@ -59,7 +60,7 @@ TRANSLATIONS.each do |lang|
     rel = '.' if rel.empty?
     url = file.sub(%r{^#{ROOT}/#{SRC}/#{lang}/site/*}, "#{lang}/").sub(/\.(html|md)$/, '')
     content = File.read(file)
-    gen = Generator.new(lang, url, file =~ %r{/guides/} ? :guide : :regular, rel)
+    gen = Generator.new(lang, url, file =~ %r{/guides/} ? :guide : :regular, rel.gsub(%r{^\.\./}, ''))
     gen.content = content
     case file
     when /\.md$/
