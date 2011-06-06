@@ -20,8 +20,10 @@ module Helpers
   end
   
   def erb(__file)
-    LAYOUTS[__file] ||= File.read(File.join(ROOT, SRC, self.lang, 'templates', "#{__file}.erb"))
-    ERB.new(LAYOUTS[__file], 0, '<>').result(binding)
+    lang = self.lang
+    LAYOUTS[__file] ||= {}
+    LAYOUTS[__file][lang] ||= File.read(File.join(ROOT, SRC, lang, 'templates', "#{__file}.erb"))
+    ERB.new(LAYOUTS[__file][lang], 0, '<>').result(binding)
   end
 end
 
