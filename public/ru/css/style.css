@@ -45,6 +45,37 @@ p code { padding: 1px; border-radius: 3px; font-size: 1.2em; padding: 0 6px; }
 #nav li a.other { background: #f5ee00; }
 #nav li a:hover { background: #ff0; border-top-color: #c5c5c5; color: #e60; }
 
+#lang {
+  float: right;
+  margin-right: 150px;
+}
+
+#lang li {
+  list-style: none;
+  float: left;
+}
+
+#lang li a {
+  border-radius: 4px; -moz-border-radius: 4px;
+  border: 1px solid #dadada;
+  color: #888;
+  text-decoration: none;
+  padding: 5px;
+  margin-left: 3px;
+}
+
+#lang li a:hover {
+  border-radius: 4px; -moz-border-radius: 4px;
+  border: 1px solid #dadada;
+  background: #fff;
+}
+
+.this_language {
+  font-weight: bold;
+  text-decoration: underline;
+  background: #fff;
+}
+
 #showcase { height: 300px; width: 950px; margin: 0 auto; position: relative; }
 #showcase .swap { float: left; background-repeat: no-repeat; background-position: top center; height: 300px; width: 950px; margin: 0 auto; position: relative; }
 #showcase .swap h1 { padding: 0; margin: 0; text-align: center; font-size: 36px; padding-top: 18px; }
